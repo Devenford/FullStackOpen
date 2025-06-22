@@ -1,5 +1,13 @@
-p {
-  color: red;
-  width: 500px;
-  border: 1px solid black;
+p,
+li {
+  /* px means "pixels". The base font sie is now 10 pixels high*/
+  font-size: 20px;
+  font-family: Tinos;
+  line-height: 1.2;
+  letter-spacing: 1px;
+}
+
+h1 {
+  font-size: 60px;
+  text-align: center;
 }
