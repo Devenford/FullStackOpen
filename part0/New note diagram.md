@@ -28,4 +28,6 @@ sequenceDiagram
     activate server
     server ->>browser: [{"content": "ez", "date": "2025-06-27T13:51:49.286Z"},{"content": "ABABABABABABAB", "date": "2025-06-27T13:54:40.308Z"},...]
     deactivate server
+
+    Note right of browser: The browser executes the callback function that renders the notes
     
