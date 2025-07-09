@@ -1,21 +1,30 @@
 const Hello = (props) => {
-  console.log(props)
+  const birthYear = () => {
+    const yearNow = new Date().getFullYear()
+    return yearNow - props.age
+  }
+
   return (
     <div>
-      <p>Hello {props.name}, you are {props.age} years old</p>
+      <p>
+        Hello {props.name}, you are {props.age} years old
+      </p>
+      <p>So, you were born in {birthYear()}</p>
     </div>
   )
 }
 
 const App = () => {
-  const friends = [ 'Peter', 'Maya']
+  const name = 'Peter'
+  const age = 10
 
   return (
     <div>
-      <p>{friends}</p>
+      <h1>Greetings</h1>
+      <Hello name='Maya' age={26 + 10} />
+      <Hello name={name} age={age} />
     </div>
   )
 }
-
 
 export default App
