@@ -7,7 +7,7 @@ const App = () => {
   return (
     <div>
       <div>{counter}</div>
-      <button onClick={setCounter(counter + 1)}>
+      <button onClick={() => setCounter(counter + 1)}>
         plus
       </button>
     </div>
