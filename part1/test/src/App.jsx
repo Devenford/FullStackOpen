@@ -5,13 +5,29 @@ const App = () => {
     left: 0, right: 0
   })
 
+  const handleLeftClick = () => {
+    const newClicks = {
+      left: clicks.left + 1, 
+      right: clicks.right
+    }
+    setClicks(newClicks)
+  }
+
+  const handleRightClick = () => {
+    const newClicks = {
+      left: clicks.left, 
+      right: clicks.right + 1
+    }
+    setClicks(newClicks)
+  }
+
   return (
     <div>
       {clicks.left}
-      <button onClick={() => setClicks(clicks.left + 1)}>
+      <button onClick={handleLeftClick}>
         left
       </button>
-      <button onClick={() => setClicks(clicks.right + 1)}>
+      <button onClick={handleRightClick}>
         right
       </button>
       {clicks.right}
