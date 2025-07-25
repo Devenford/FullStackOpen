@@ -6,7 +6,7 @@ const App = () => {
   return (
     <div>
       {value}
-      <button onClick={() => console.log('clicked button')}>reset to zero</button>
+      <button onClick={() => setValue(0)}>reset to zero</button>
     </div>
   )
 }
