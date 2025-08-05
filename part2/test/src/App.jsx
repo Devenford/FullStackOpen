@@ -4,7 +4,7 @@ var animals = [
   {name: 'Hamilton', species: 'dog'},
   {name: 'Harold', species: 'fish'},
   {name: 'Ursula', species: 'cat'},
-  {name: 'Jimmy', species: 'fish'}
+  {name: 'Jimmy', species:  'fish'}
 ]
 
 var isDog = function(animal) {
