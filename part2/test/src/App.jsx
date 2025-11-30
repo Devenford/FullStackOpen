@@ -1,45 +1,18 @@
-var animals = [
-  {name: 'Fluffykins', species: 'rabbit'},
-  {name: 'Caro', species: 'dog'},
-  {name: 'Hamilton', species: 'dog'},
-  {name: 'Harold', species: 'fish'},
-  {name: 'Ursula', species: 'cat'},
-  {name: 'Jimmy', species:  'fish'}
-]
-
-var isDog = function(animal) {
-  return animals.species === 'dogs'
-}
-
-var dogs = animals.filter(isDog)
-
-
-
-
-
-/*
-var dogs = []
-for (var i=0; i<animals.length; i++) {
-  if(animals[i].species === 'dog') {
-    dogs.push(animals[i])
-  }
-}*/
-
-
-
-
-
-
-
-
-
-
-
-const App = () => {
-
+const Hello = () => {
   return (
-    <div>Hello</div>
+    <div>
+      <p>Hello world</p>
+    </div>
   )
 }
 
+const App = () => {
+  return (
+    <div>
+      <h1>Greetings</h1>
+      <Hello />
+    </div>
+  )
+}
+console.log
 export default App
