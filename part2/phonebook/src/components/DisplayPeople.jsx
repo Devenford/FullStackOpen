@@ -1,7 +1,14 @@
+const Person = ({person}) => {
+    return (
+        <li>{person.name} {person.number}</li>
+    )
+}
+
+
 const People = ({peopleToShow}) => {
     return (
         <ul>
-        {peopleToShow.map((person) => <li key={person.id}>{person.name} {person.number}</li>)}
+        {peopleToShow.map((person) => <Person key={person.id} person={person}/>)}
       </ul>
     )
 }
