@@ -3,6 +3,7 @@ import Filter from './components/FilterPeople'
 import PersonForm from './components/PersonForm'
 import People from './components/DisplayPeople'
 import axios from 'axios'
+import dataService from './services/data'
 
 const App = () => {
   const [people, setPeople] = useState([])
@@ -11,11 +12,9 @@ const App = () => {
   const [nameFilter, setNameFilter] = useState('')
 
   const hook = () => {
-    axios
-        .get("http://localhost:3001/persons")
-        .then(response => {
-          setPeople(response.data)
-        })
+    dataService
+      .getAll()
+      .then(initialData => setPeople(initialData))
   }
 
   useEffect(hook, [])
@@ -28,11 +27,20 @@ const App = () => {
       alert(`${newName} has already been added to the phonebook`)
     }
     else {
-    const newPerson = {name : newName, number: newNumber, id: people.length + 1}
-    setPeople(people.concat(newPerson))
-    setNewName('')
-    setNewNumber('')
+      const newPerson = {name : newName, number: newNumber}
+
+      dataService
+        .create(newPerson)
+        .then(returnedContact => {
+          setPeople(people.concat(returnedContact))
+          setNewName('')
+          setNewNumber('')
+        })
     }
+  }
+
+  const deletePerson = (id) => {
+    setPeople(people.filter(person => person.id!==id))
   }
 
   const handleInputNameChange = (event) => {
@@ -57,7 +65,7 @@ const App = () => {
       <h2>Numbers</h2>
       <Filter value={nameFilter} onChange={handleFilterChange}/>
 
-      <People peopleToShow={peopleToShow}/>
+      <People peopleToShow={peopleToShow} deletePerson={deletePerson}/>
     </div>
   )
 }
