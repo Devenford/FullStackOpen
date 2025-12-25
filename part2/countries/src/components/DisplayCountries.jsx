@@ -33,7 +33,7 @@ const DisplayCountries = ({countries, inputCountry, setInputCountry}) => {
     }
     
     const countriesToDisplay = countries.filter(country =>
-        country.name.common.toLowerCase().startsWith(inputCountry.toLowerCase()))
+        country.name.common.toLowerCase().includes(inputCountry.toLowerCase()))
 
     const count = countriesToDisplay.length
 
