@@ -16,6 +16,17 @@ const DisplayLanguages = ({languages}) => {
     )
 }
 
+const DisplayEachCountry = ({country, setInputCountry}) => {
+    const countryName = country.name.common
+
+    return (
+        <li>
+            {countryName}
+            <button onClick={() => setInputCountry(countryName)}>Show</button>
+        </li>
+    )
+}
+
 const DisplayCountries = ({countries, inputCountry, setInputCountry}) => {
     if (countries===null || inputCountry==='') {
         return null
@@ -36,7 +47,7 @@ const DisplayCountries = ({countries, inputCountry, setInputCountry}) => {
         return (
             <ul>
                 {countriesToDisplay.map(country =>
-                    <li key={country.cca3}>{country.name.common}</li>
+                    <DisplayEachCountry key={country.cca3} country={country} setInputCountry={setInputCountry}/>
                 )}
             </ul>
         )
