@@ -14,61 +14,93 @@ app.use(express.static('dist'))
 const Entry = require('./models/entry.js')
 
 // route handlers:
-app.get('/api/persons', (request, response) => {
-    Entry.find({}).then(entries => {
+app.get('/api/persons', (request, response, next) => {
+    Entry.find({})
+    .then(entries => {
       response.json(entries)
     })
+    .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Entry.findById(request.params.id)
-  .then(entry => response.json(entry))
-  .catch(error => {
-    console.log('error finding person by id: ', error)
-    response.status(404).end()
+  .then(entry => {
+    if(entry) {
+      response.json(entry)
+    }
+    else {
+      response.status(404).end()
+    }
   })
+  .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
-  body = request.body
-
-  if (!body.name) {
-    return response.status(400).json({error: 'name missing'})
-  }
-
-  if(!body.number) {
-    return response.status(400).json({error: 'phone number missing'})
-  }
-
-  /*
-  if(entries.some(entry => entry.name === body.name)) {
-    return response.status(400).json({error: 'name must be unique'})
-  }
-  */
-
-  const entry = new Entry({
-    name: body.name,
-    number: body.number
-  })
-
-  entry.save().then(savedEntry => response.json(savedEntry))
-})
-
-/*
-app.get('/api/info', (request, response) => {
+app.get('/api/info', (request, response, next) => {
   const time = new Date()
-  response.send(`<div>
+  Entry.find({})
+  .then(entries => {
+    response.send(`<div>
     <p>Phonebook has info for ${entries.length} people</p>
     <p>${time}</p>
     </div>`)
+  })
+  .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-  id = request.params.id
-  entries = entries.filter(entry => entry.id !== id)
-  response.status(204).end()
+app.post('/api/persons', (request, response, next) => {
+  const {name, number} = request.body
+
+  if (!name) {
+    return response.status(400).json({error: 'name missing'})
+  }
+
+  if(!number) {
+    return response.status(400).json({error: 'phone number missing'})
+  }
+
+  Entry.find({name: name})
+  .then(entries => {
+    let entry
+    if(entries.length !== 0) {
+      entry = entries[0]
+      entry.name = name
+      entry.number = number
+    }
+    else {
+      entry = new Entry({
+        name: name,
+        number: number
+      })
+    }
+
+    return entry.save().then(savedEntry => response.json(savedEntry))
+  })
+  .catch(error => next(error))
 })
-*/
+
+app.delete('/api/persons/:id', (request, response, next) => {
+  Entry.findByIdAndDelete(request.params.id)
+  .then(result => {
+    if(!result) {
+      return response.status(404).end()
+    }
+
+    response.status(204).end()
+  })
+  .catch(error => next(error))
+})
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if(error.name === 'CastError') {
+    return response.status(400).send({error: 'malformatted id'})
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
