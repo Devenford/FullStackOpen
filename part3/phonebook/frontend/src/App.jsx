@@ -38,6 +38,13 @@ const App = () => {
           setMessage({message: `Added ${newPerson.name}`, className: 'success'})
           setTimeout(() => setMessage({message: null, className: null}), 5000)
         })
+        .catch(error => {
+          setNewName('')
+          setNewNumber('')
+          console.log(error.response.data.error)
+          setMessage({message: error.response.data.error, className: 'error'})
+          setTimeout(() => setMessage({message: null, className: null}), 5000)
+        })
     }
     else {
       if(confirm(`${newName} has already been added to the phonebook, replace the old number with the new one?`)) {
@@ -57,7 +64,7 @@ const App = () => {
                   setNewName('')
                   setNewNumber('')
                   setMessage({message: `Information of ${updatedPerson.name} has already been removed from the server`, className: 'error'})
-                    setTimeout(() => setMessage({message: null, className: null}), 5000)
+                  setTimeout(() => setMessage({message: null, className: null}), 5000)
                 })
       }
     }
