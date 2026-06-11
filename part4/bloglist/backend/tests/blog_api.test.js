@@ -1,19 +1,30 @@
-const { test, after, beforeEach, describe } = require('node:test')
+const { test, after, beforeEach, describe, before } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
+let testUser
 
+before(async () => {
+  await User.deleteMany({})
+  testUser = await helper.getTestUser()
+})
 
 describe('When a few blogs are initially saved', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
-    await Blog.insertMany(helper.initialBlogs)
+
+    const initialBlogs = helper.initialBlogs.map(b => {
+      return { ...b, user: testUser._id }
+    })
+
+    await Blog.insertMany(initialBlogs)
   })
 
   test('blogs are returned as json', async () => {
@@ -45,6 +56,7 @@ describe('When a few blogs are initially saved', () => {
 
       const response = await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${helper.getTestToken(testUser)}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -69,6 +81,7 @@ describe('When a few blogs are initially saved', () => {
 
       const response = await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${helper.getTestToken(testUser)}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -85,6 +98,7 @@ describe('When a few blogs are initially saved', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${helper.getTestToken(testUser)}`)
         .send(newBlog)
         .expect(400)
     })
@@ -98,8 +112,23 @@ describe('When a few blogs are initially saved', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${helper.getTestToken(testUser)}`)
         .send(newBlog)
         .expect(400)
+    })
+
+    test('fails with status code 401 Unauthorized if the token is not provided', async () => {
+      const newBlog = {
+        title: 'Star Wars',
+        author: 'George Lucas',
+        url: 'http://starwars.com/revenge-of-the-sith',
+        likes: 2,
+      }
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
     })
   })
 
@@ -109,11 +138,14 @@ describe('When a few blogs are initially saved', () => {
       const blogToBeUpdated = blogsAtStart[0]
       const updatedBlogData = {
         ...blogToBeUpdated,
-        likes: blogToBeUpdated.likes + 1
+        likes: blogToBeUpdated.likes + 1,
+        user: blogToBeUpdated.user.toString()
       }
+      // .toJSON(), called in the test_helper, only converts the blog id to a string, NOT the user id. So, you must convert the user id to a string manually for the deepStrictEqual test below to work.
 
       const updatedBlog = await api
         .put(`/api/blogs/${updatedBlogData.id}`)
+        .set('Authorization', `Bearer ${helper.getTestToken(testUser)}`)
         .send(updatedBlogData)
         .expect(200)
         .expect('Content-Type', /application\/json/)
@@ -129,6 +161,7 @@ describe('When a few blogs are initially saved', () => {
 
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${helper.getTestToken(testUser)}`)
         .expect(204)
 
       const blogsAtEnd = await helper.blogsInDb()
