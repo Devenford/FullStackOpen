@@ -1,7 +1,6 @@
-const jwt = require('jsonwebtoken')
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
+const { userExtractor } = require('../utils/middleware')    // object destructuring
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
@@ -9,7 +8,7 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.get('/:id', async (request, response) => {
-  const blog = await Blog.findById(request.params.id)
+  const blog = await Blog.findById(request.params.id).populate('user', { username: 1, name: 1 })
 
   if (blog) {
     response.json(blog)
@@ -19,27 +18,9 @@ blogsRouter.get('/:id', async (request, response) => {
   }
 })
 
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '')
-  }
-
-  return null
-}
-
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', userExtractor, async (request, response) => {
   const body = request.body
-  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
-  }
-  const user = await User.findById(decodedToken.id)
-
-  if (!user) {
-    return response.status(400).json({ error: 'userId missing or not valid' })
-  }
+  const user = request.user
 
   const blog = new Blog({
     title: body.title,
@@ -56,12 +37,19 @@ blogsRouter.post('/', async (request, response) => {
   response.status(201).json(savedBlog)
 })
 
-blogsRouter.put('/:id', async (request, response) => {
+blogsRouter.put('/:id', userExtractor, async (request, response) => {
+  const user = request.user
+
   const { title, author, url, likes } = request.body
   const blogToBeUpdated = await Blog.findById(request.params.id)
 
   if (!blogToBeUpdated) {
-    return response.status(404).end()
+    return response.status(404).json({ error: 'blog does not exist' })
+  }
+
+  if (blogToBeUpdated.user.toString() !== user._id.toString()) // you require .toString(), since .user and ._id return ObjectId and === compares objects by reference
+  {
+    return response.status(403).json({ error: 'forbidden updation' })
   }
 
   blogToBeUpdated.title = title
@@ -73,13 +61,19 @@ blogsRouter.put('/:id', async (request, response) => {
   response.status(200).json(updatedBlog)
 })
 
-blogsRouter.delete('/:id', async (request, response) => {
-  const result = await Blog.findByIdAndDelete(request.params.id)
-
-  if (!result) {
-    return response.status(404).end()
+blogsRouter.delete('/:id', userExtractor, async (request, response) => {
+  const user = request.user
+  const blog = await Blog.findById(request.params.id)
+  if (!blog) {
+    return response.status(404).json({ error: 'blog does not exist' })
   }
 
+  if (blog.user.toString() !== user._id.toString()) // you require .toString(), since .user and ._id return ObjectId and === compares objects by reference
+  {
+    return response.status(403).json({ error: 'forbidden deletion' })
+  }
+
+  await blog.deleteOne()
   response.status(204).end()
 })
 
