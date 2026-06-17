@@ -6,7 +6,7 @@ import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [message, setMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -41,9 +41,11 @@ const App = () => {
       setPassword('')
     }
     catch {
-      setErrorMessage('wrong username or password')
+      setMessage({
+        data: 'wrong username or password', className: 'error'
+      })
       setTimeout(() => {
-        setErrorMessage(null)
+        setMessage(null)
       }, 5000)
     }
   }
@@ -89,11 +91,21 @@ const App = () => {
       const blog = await blogService.create(newBlog)
       setBlogs(blogs.concat(blog))
       setNewBlog({title: '', author: '', url: ''})
+      setMessage({
+        data: `A new blog: ${blog.title} by ${blog.author} added`, 
+        className: 'success'
+      })
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
     }
     catch {
-      setErrorMessage('invalid blog')
+      setMessage({
+        data: 'invalid blog', 
+        className: 'error'
+      })
       setTimeout(() => {
-        setErrorMessage(null)
+        setMessage(null)
       }, 5000)
     }
   }
@@ -154,7 +166,7 @@ const App = () => {
 
   return (
     <div>
-      <Notification message={errorMessage} />
+      <Notification message={message} />
       {!user && loginForm()}
       {user && displayUserContent()}
     </div>
