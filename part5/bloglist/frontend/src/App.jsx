@@ -16,8 +16,8 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
+      setBlogs(blogs)
+    )
   }, [])
 
   useEffect(() => {
@@ -45,7 +45,7 @@ const App = () => {
       setTimeout(() => {
         setMessage(null)
       }, 5000)
-      
+
       throw error
     }
   }
@@ -61,7 +61,7 @@ const App = () => {
       const blog = await blogService.create(blogObject)
       setBlogs(blogs.concat(blog))
       setMessage({
-        data: `A new blog: ${blog.title} by ${blog.author} added`, 
+        data: `A new blog: ${blog.title} by ${blog.author} added`,
         className: 'success'
       })
       setTimeout(() => {
@@ -70,7 +70,7 @@ const App = () => {
     }
     catch {
       setMessage({
-        data: 'invalid blog', 
+        data: 'invalid blog',
         className: 'error'
       })
       setTimeout(() => {
@@ -79,11 +79,33 @@ const App = () => {
     }
   }
 
-  const DisplayUserBlogs = () => (
-    <div>
-      {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
-    </div>
-  )
+  const updateLikes = async blog => {
+    const updatedBlog = await blogService.update({
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: blog.likes + 1,
+      id: blog.id
+    })
+    setBlogs(blogs.map(b => b.id === updatedBlog.id ? updatedBlog : b))
+  }
+
+  const deleteBlog = async blog => {
+    if (confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      const deletedBlog = await blogService.deletion(blog)
+      setBlogs(blogs.filter(b => b.id !== deletedBlog.id))
+    }
+  }
+
+  const DisplayUserBlogs = () => {
+    blogs.sort((b1, b2) => b2.likes - b1.likes)
+
+    return (
+      <div>
+        {blogs.map(blog => <Blog key={blog.id}user={user} blog={blog} updateLikes={updateLikes} deleteBlog={deleteBlog}/>)}
+      </div>
+    )
+  }
 
   const DisplayUserContent = () => (
     <div>
