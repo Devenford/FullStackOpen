@@ -79,22 +79,23 @@ const App = () => {
     }
   }
 
-  const displayUserBlogs = () => (
-    <p>{blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
-      )}
-    </p>
+  const DisplayUserBlogs = () => (
+    <div>
+      {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
+    </div>
   )
 
-  const displayUserContent = () => (
+  const DisplayUserContent = () => (
     <div>
       <h1>Blogs</h1>
-      <p>{user.name} logged in</p>
-      <button onClick={handleLogout}>logout</button>
+      <div>{user.name} logged in <button onClick={handleLogout}>logout</button>
+      </div>
+      <br />
       <Togglable buttonLabel='create new blog' ref={blogFormRef}>
         <NewBlogForm createBlog={addBlog} />
       </Togglable>
-      {displayUserBlogs()}
+      <br />
+      <DisplayUserBlogs />
     </div>
   )
 
@@ -102,7 +103,7 @@ const App = () => {
     <div>
       <Notification message={message} />
       {!user && <LoginForm performLogin={handleLogin}/>}
-      {user && displayUserContent()}
+      {user && <DisplayUserContent />}
     </div>
   )
 }
