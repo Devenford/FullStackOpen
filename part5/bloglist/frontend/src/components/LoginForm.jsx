@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState } from 'react'
 
 const LoginForm = ({ performLogin }) => {
   const [username, setUsername] = useState('')
@@ -23,10 +23,10 @@ const LoginForm = ({ performLogin }) => {
         <div>
           <label>
             username
-            <input 
-            type='text'
-            value={username}
-            onChange={({ target }) => setUsername(target.value)}
+            <input
+              type='text'
+              value={username}
+              onChange={({ target }) => setUsername(target.value)}
             />
           </label>
         </div>
@@ -34,9 +34,9 @@ const LoginForm = ({ performLogin }) => {
           <label>
             password
             <input
-            type='password'
-            value={password}
-            onChange={({ target }) => setPassword(target.value)}
+              type='password'
+              value={password}
+              onChange={({ target }) => setPassword(target.value)}
             />
           </label>
         </div>

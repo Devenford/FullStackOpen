@@ -8,6 +8,6 @@ const Notification = ({ message }) => {
       {message.data}
     </div>
   )
-} 
+}
 
 export default Notification
